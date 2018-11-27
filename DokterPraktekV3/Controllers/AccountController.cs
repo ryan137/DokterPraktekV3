@@ -17,6 +17,7 @@ namespace DokterPraktekV3.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private DokterPraktekEntities db = new DokterPraktekEntities();
 
         public AccountController()
         {
@@ -139,7 +140,16 @@ namespace DokterPraktekV3.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
-            return View();
+            // GET: Roles
+            var viewModel = new RegisterViewModel();
+            viewModel.Roles = db.AspNetRoles
+                .OrderBy(x => x.Id)
+                .Select(x => new SelectListItem
+                {
+                    Value = x.Id,
+                    Text = x.Name
+                }).ToList();
+            return View(viewModel);
         }
 
         //
@@ -156,7 +166,7 @@ namespace DokterPraktekV3.Controllers
                 if (result.Succeeded)
                 {
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
+                    await UserManager.AddToRoleAsync(user.Id, db.AspNetRoles.Where(x => x.Id == model.SelectedRole).Select(x => x.Name).First());
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
                     // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);

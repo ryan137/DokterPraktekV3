@@ -1,0 +1,66 @@
+﻿@model DokterPraktekV3.MedicalHistory
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>MedicalHistory</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.DoctorID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DoctorID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PatientID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PatientID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Sickness)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Sickness)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DescriptionInfo)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DescriptionInfo)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CheckUpDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CheckUpDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CheckUpPrice)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CheckUpPrice)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

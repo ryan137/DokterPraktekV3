@@ -44,14 +44,52 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.AI.Agent.Intercept, Version=1.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.Agent.Intercept.1.2.1\lib\net45\Microsoft.AI.Agent.Intercept.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AI.DependencyCollector, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.0.0\lib\net45\Microsoft.AI.DependencyCollector.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AI.PerfCounterCollector, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.0.0\lib\net45\Microsoft.AI.PerfCounterCollector.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AI.ServerTelemetryChannel, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.0.0\lib\net45\Microsoft.AI.ServerTelemetryChannel.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AI.Web, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.Web.2.0.0\lib\net45\Microsoft.AI.Web.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AI.WindowsServer, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.WindowsServer.2.0.0\lib\net45\Microsoft.AI.WindowsServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.ApplicationInsights, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.2.0.0\lib\net45\Microsoft.ApplicationInsights.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PagedList.Mvc, Version=4.5.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\PagedList.Mvc.4.5.0.0\lib\net40\PagedList.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -177,27 +215,131 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="AspNetRole.cs">
+      <DependentUpon>DokterPraktek.tt</DependentUpon>
+    </Compile>
+    <Compile Include="AspNetUser.cs">
+      <DependentUpon>DokterPraktek.tt</DependentUpon>
+    </Compile>
+    <Compile Include="AspNetUserClaim.cs">
+      <DependentUpon>DokterPraktek.tt</DependentUpon>
+    </Compile>
+    <Compile Include="AspNetUserLogin.cs">
+      <DependentUpon>DokterPraktek.tt</DependentUpon>
+    </Compile>
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\DoctorSpecialistsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\PatientMedicinesController.cs" />
+    <Compile Include="Controllers\PatientPicturesController.cs" />
+    <Compile Include="Controllers\PaymentsController.cs" />
+    <Compile Include="Controllers\SchedulesController.cs" />
+    <Compile Include="Controllers\SpecialistsController.cs" />
+    <Compile Include="Controllers\WorkSchedulesController.cs" />
+    <Compile Include="C__MigrationHistory.cs">
+      <DependentUpon>DokterPraktek.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DoctorSpecialist.cs">
+      <DependentUpon>DokterPraktek.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DokterPraktek.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DokterPraktek.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DokterPraktek.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DokterPraktek.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DokterPraktek.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DokterPraktek.edmx</DependentUpon>
+    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Controllers\MedicalHistoriesController.cs" />
+    <Compile Include="MedicalHistory.cs">
+      <DependentUpon>DokterPraktek.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Medicine.cs">
+      <DependentUpon>DokterPraktek.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\MedicinesController.cs" />
+    <Compile Include="MedicineTransaction.cs">
+      <DependentUpon>DokterPraktek.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\MedicineTransactionsController.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\VM_DoctorSchedules.cs" />
+    <Compile Include="Patient.cs">
+      <DependentUpon>DokterPraktek.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PatientMedicine.cs">
+      <DependentUpon>DokterPraktek.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PatientPicture.cs">
+      <DependentUpon>DokterPraktek.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\PatientsController.cs" />
+    <Compile Include="Payment.cs">
+      <DependentUpon>DokterPraktek.tt</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Schedule.cs">
+      <DependentUpon>DokterPraktek.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Services\PatientService.cs" />
+    <Compile Include="Services\ScheduleService.cs" />
+    <Compile Include="Services\UserService.cs" />
+    <Compile Include="Specialist.cs">
+      <DependentUpon>DokterPraktek.tt</DependentUpon>
+    </Compile>
     <Compile Include="Startup.cs" />
+    <Compile Include="sysdiagram.cs">
+      <DependentUpon>DokterPraktek.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WorkSchedule.cs">
+      <DependentUpon>DokterPraktek.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\PagedList.css" />
+    <Content Include="DokterPraktek.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>DokterPraktek.edmx</DependentUpon>
+      <LastGenOutput>DokterPraktek.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="DokterPraktek.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>DokterPraktek.edmx</DependentUpon>
+      <LastGenOutput>DokterPraktek.cs</LastGenOutput>
+    </Content>
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Scripts\ai.0.22.9-build00167.js" />
+    <Content Include="Scripts\ai.0.22.9-build00167.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="ApplicationInsights.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <EntityDeploy Include="DokterPraktek.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>DokterPraktek.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="DokterPraktek.edmx.diagram">
+      <DependentUpon>DokterPraktek.edmx</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -210,7 +352,9 @@
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\_references.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -244,6 +388,62 @@
     <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\MedicalHistories\Create.cshtml" />
+    <Content Include="Views\MedicalHistories\Delete.cshtml" />
+    <Content Include="Views\MedicalHistories\Details.cshtml" />
+    <Content Include="Views\MedicalHistories\Edit.cshtml" />
+    <Content Include="Views\MedicalHistories\Index.cshtml" />
+    <Content Include="Views\Medicines\Create.cshtml" />
+    <Content Include="Views\Medicines\Delete.cshtml" />
+    <Content Include="Views\Medicines\Details.cshtml" />
+    <Content Include="Views\Medicines\Edit.cshtml" />
+    <Content Include="Views\Medicines\Index.cshtml" />
+    <Content Include="Views\MedicineTransactions\Create.cshtml" />
+    <Content Include="Views\MedicineTransactions\Delete.cshtml" />
+    <Content Include="Views\MedicineTransactions\Details.cshtml" />
+    <Content Include="Views\MedicineTransactions\Edit.cshtml" />
+    <Content Include="Views\MedicineTransactions\Index.cshtml" />
+    <Content Include="Views\Patients\Create.cshtml" />
+    <Content Include="Views\Patients\Delete.cshtml" />
+    <Content Include="Views\Patients\Details.cshtml" />
+    <Content Include="Views\Patients\Edit.cshtml" />
+    <Content Include="Views\Patients\Index.cshtml" />
+    <Content Include="Views\PatientMedicines\Create.cshtml" />
+    <Content Include="Views\PatientMedicines\Delete.cshtml" />
+    <Content Include="Views\PatientMedicines\Details.cshtml" />
+    <Content Include="Views\PatientMedicines\Edit.cshtml" />
+    <Content Include="Views\PatientMedicines\Index.cshtml" />
+    <Content Include="Views\PatientPictures\Create.cshtml" />
+    <Content Include="Views\PatientPictures\Delete.cshtml" />
+    <Content Include="Views\PatientPictures\Details.cshtml" />
+    <Content Include="Views\PatientPictures\Edit.cshtml" />
+    <Content Include="Views\PatientPictures\Index.cshtml" />
+    <Content Include="Views\Payments\Create.cshtml" />
+    <Content Include="Views\Payments\Delete.cshtml" />
+    <Content Include="Views\Payments\Details.cshtml" />
+    <Content Include="Views\Payments\Edit.cshtml" />
+    <Content Include="Views\Payments\Index.cshtml" />
+    <Content Include="Views\Schedules\Create.cshtml" />
+    <Content Include="Views\Schedules\Delete.cshtml" />
+    <Content Include="Views\Schedules\Details.cshtml" />
+    <Content Include="Views\Schedules\Edit.cshtml" />
+    <Content Include="Views\Schedules\Index.cshtml" />
+    <Content Include="Views\Specialists\Create.cshtml" />
+    <Content Include="Views\Specialists\Delete.cshtml" />
+    <Content Include="Views\Specialists\Details.cshtml" />
+    <Content Include="Views\Specialists\Edit.cshtml" />
+    <Content Include="Views\Specialists\Index.cshtml" />
+    <Content Include="Views\WorkSchedules\Create.cshtml" />
+    <Content Include="Views\WorkSchedules\Delete.cshtml" />
+    <Content Include="Views\WorkSchedules\Details.cshtml" />
+    <Content Include="Views\WorkSchedules\Edit.cshtml" />
+    <Content Include="Views\WorkSchedules\Index.cshtml" />
+    <Content Include="Views\DoctorSpecialists\Create.cshtml" />
+    <Content Include="Views\DoctorSpecialists\Delete.cshtml" />
+    <Content Include="Views\DoctorSpecialists\Details.cshtml" />
+    <Content Include="Views\DoctorSpecialists\Edit.cshtml" />
+    <Content Include="Views\DoctorSpecialists\Index.cshtml" />
+    <Content Include="Views\Home\DoctorSchedules.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -255,6 +455,9 @@
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

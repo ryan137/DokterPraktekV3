@@ -1,0 +1,70 @@
+﻿@model  PagedList.IPagedList<DokterPraktekV3.Schedule>
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "TodayPatient";
+}
+
+
+
+<section class="content-header">
+    <h1>Today Schedule Doctor @ViewBag.DoctorName</h1>
+</section>
+<!-- Main content -->
+<section class="content">
+    <!-- /.row -->
+    <div class="box box-danger">
+        <div class="box-header">
+        </div>
+        <div class="box-body">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>
+                            No Booking
+                        </th>
+                        <th>
+                            Patient Name
+                        </th>
+                        <th>
+                            Booking Status
+                        </th>
+                        <th>
+                            Gender
+                        </th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @item.BookingNumber
+                        </td>
+                        <td>
+                            @item.Patient.Name
+                        </td>
+                        <td>
+                            @item.BookingStatus
+                        </td>
+                        <td>
+                            @if (item.Patient.Gender == false)
+                                {<p>Wanita</p>}
+                                else
+                                {<p>Pria</p>}
+                        </td>
+                        <td>
+                            <a href="/Doctors/InputHistory/@item.DoctorID"><button class="btn btn-primary">Input history</button></a>
+                        </td>
+                    </tr>
+                }
+            </table>
+            <br />
+            Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+            @Html.PagedListPager(Model, page => Url.Action("Index",
+    new { page, currentFilter = ViewBag.CurrentFilter }))
+        </div>
+    </div>
+</section>
+
+
+
