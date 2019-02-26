@@ -1,0 +1,95 @@
+﻿@model List<DokterPraktekV3.Models.VM_SelectDoctor>
+
+@{
+    ViewBag.Title = "SelectDoctor";
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+}
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a href="#"><img src="~/Assets/images/icon/logo_esc.png" alt="logo" style="width:40%;height:50%"></a>
+        </div>
+    </div>
+</div>
+<div class="main-content-inner">
+    <div class="row">
+        @for (int i = 0; i < Model.Count(); i++)
+        {
+            string accordionParent = "accordion-parent" + i;
+            string accordionSpecialist = "accordion-specialist" + i;
+            string accordionSchedule = "accordion-schedule" + i;
+            <div class="col-lg-12 mt-5">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="header-title">@Model[i].DoctorName</h4>
+                        <div id="accordionParent" class="according accordion-s2 gradiant-bg">
+                            <input type="hidden" class="doctorId" value="@Model[i].DoctorID" />
+                            <div class="card">
+                                <img src="~/Assets/images/default-user-image.png" style="width:10%;height:10%"/>
+                                <br />
+                                <div class="card-header">
+                                    <a class="card-link collapsed" data-toggle="expanded" href="#@accordionSchedule" aria-expanded="false">
+                                        Schedule
+                                    </a>
+                                </div>
+                                <div id="@accordionSchedule" class="expanded" data-parent="#@accordionParent" style="">
+                                    <div class="card-body">
+                                        @for (int k = 0; k < Model[i].WorkSchedule.Count(); k++)
+                                        {
+                                            if (k == 0)
+                                            {
+                                                <p>@Model[i].WorkSchedule[k].Day</p>
+                                            }
+                                            else
+                                            {
+                                                <br />
+                                                <p>@Model[i].WorkSchedule[k].Day</p>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <button type="button" class="btn btn-secondary mb-3 pull-right btn-select-doctor" data-toggle="modal" data-target="#exampleModalLong">Choose</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="modal fade" id="exampleModalLong" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal"><span>×</span></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Already have a Patient Number ?
+                </p>
+            </div>
+            <div class="modal-footer">
+                <a href="" id="newPatient" class="btn btn-secondary">No, I'm new here</a>
+                <a href="" id="registeredPatient" class="btn btn-primary">Yes, I already have my Patient Number</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script type="text/javascript">
+
+        $(".btn-select-doctor").on("click", function () {
+            var par = $(this).parent();
+            var idDoctor = par.find(".doctorId").val();
+
+            $("#newPatient").attr("href", "/Schedules/Create/?doctorId=" + idDoctor);
+            $("#registeredPatient").attr("href", "/Schedules/CreateRegistered/?doctorId=" + idDoctor);
+        })
+    </script>
+
+}

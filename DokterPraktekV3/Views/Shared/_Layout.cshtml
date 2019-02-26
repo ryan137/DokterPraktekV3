@@ -1,69 +1,128 @@
 ﻿<!DOCTYPE html>
-<html>
+<html class="no-js" lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
-    @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Dokter Praktek</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    @Styles.Render("~/Content/assets/css")
+
+    @RenderSection("DataTableStyleSheets", required: false)
+
+    @Scripts.Render("~/bundles/Scripts/assets")
 
 </head>
-<body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    @if (User.IsInRole("Doctor"))
-                    {
-                        <li>@Html.ActionLink("Today's Schedules", "DoctorSchedules", "Home")</li>
-                        <li>@Html.ActionLink("Medicines", "MedicineList", "Medicine")</li>
-                        <li>@Html.ActionLink("Medicine Transactions", "MedicineTrans", "MedicineTransaction")</li>
-                        <li>@Html.ActionLink("Patients", "Index", "Patient")</li>
-                        <li>@Html.ActionLink("Settings", "Settings", "Home")</li>
-                    }
-                    else if (User.IsInRole("Admin"))
-                    {
-                        <li>@Html.ActionLink("Book List", "BookList", "Home")</li>
-                        <li>@Html.ActionLink("Payment", "Index", "Payment")</li>
-                        <li>@Html.ActionLink("Patients", "Index", "Patient")</li>
-                        <li>@Html.ActionLink("All Book List", "AllBookList", "Home")</li>
-                    }
-                    else if (User.IsInRole("Superuser"))
-                    {
-                        <li>@Html.ActionLink("Book List", "BookList", "Home")</li>
-                        <li>@Html.ActionLink("Doctors", "DoctorList", "Home")</li>
-                        <li>@Html.ActionLink("Admins", "AdminList", "Home")</li>
-                        <li>@Html.ActionLink("Patients", "Index", "Patient")</li>
-                        <li>@Html.ActionLink("All Book List", "AllBookList", "Home")</li>
-                        <li>@Html.ActionLink("Create User", "Register", "Account")</li>
-                    }
-                    else
-                    {
-
-                    }
-                </ul>
-                @Html.Partial("_LoginPartial")
+<body class="body-bg">
+    <!-- preloader area start -->
+    <div id="preloader">
+        <div class="loader"></div>
+    </div>
+    <!-- preloader area end -->
+    <div class="page-container">
+        <div class="sidebar-menu">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <a href="#"><img src="~/Assets/images/icon/logo_esc.png" alt="logo"></a>
+                </div>
+                <div class="main-menu">
+                    <div class="slimScrollDiv" style="position: relative; overflow: hidden; width: auto; height: 397px;">
+                        <div class="menu-inner" style="overflow: hidden; width: auto; height: 397px;">
+                            <nav>
+                                <ul class="metismenu" id="menu">
+                                    @if (User.IsInRole("Doctor"))
+                                    {
+                                        <li>@Html.ActionLink("Today's Schedules", "TodayBookList", "Schedules")</li>
+                                        <li>@Html.ActionLink("Medicines", "MedicineList", "Medicines")</li>
+                                        <li>@Html.ActionLink("Medicine Transactions", "MedicineTransList", "MedicineTransactions")</li>
+                                        <li>@Html.ActionLink("Patients", "PatientList", "Patients")</li>
+                                        <li>@Html.ActionLink("All Schedules", "AllDoctorSchedules", "Schedules")</li>
+                                        <li>@Html.ActionLink("Settings", "Settings", "Doctors")</li>
+                                    }
+                                    else if (User.IsInRole("Admin"))
+                                    {
+                                        <li>@Html.ActionLink("Today's Schedule", "TodayBookList", "Schedules")</li>
+                                        <li>@Html.ActionLink("Payment", "Index", "Payments")</li>
+                                        <li>@Html.ActionLink("Patients", "PatientList", "Patients")</li>
+                                        <li>@Html.ActionLink("All Book List", "AllBookList", "Schedules")</li>
+                                    }
+                                    else if (User.IsInRole("Superuser"))
+                                    {
+                                        <li>@Html.ActionLink("Doctors", "DoctorList", "Doctors")</li>
+                                        <li>@Html.ActionLink("Admins", "AdminList", "Admins")</li>
+                                        <li>@Html.ActionLink("Patients", "PatientList", "Patients")</li>
+                                        <li>@Html.ActionLink("Create User", "Register", "Account")</li>
+                                    }
+                                    else
+                                    {
+                                        Response.Redirect("~/Home/Index");
+                                    }
+                                </ul>
+                            </nav>
+                        </div><div class="slimScrollBar" style="background: rgb(0, 0, 0); width: 7px; position: absolute; top: 0px; opacity: 0.4; display: none; border-radius: 7px; z-index: 99; right: 1px; height: 229.751px;"></div><div class="slimScrollRail" style="width: 7px; height: 100%; position: absolute; top: 0px; display: none; border-radius: 7px; background: rgb(51, 51, 51); opacity: 0.2; z-index: 90; right: 1px;"></div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
+        <div class="main-content">
+
+            <div class="page-title-area">
+                <div class="row align-items-center">
+                    <div class="col-sm-6">
+                        <div class="breadcrumbs-area clearfix">
+                            <h4 class="page-title pull-left titlePage">Dashboard</h4>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 clearfix">
+                        <div class="user-profile pull-right">
+                            <img class="avatar user-thumb" src="~/Assets/images/author/avatar.png" alt="avatar">
+                            <h4 class="user-name dropdown-toggle" data-toggle="dropdown">@User.Identity.Name <i class="fa fa-angle-down"></i></h4>
+                            <div class="dropdown-menu">
+                                @if (Request.IsAuthenticated)
+                                {
+                                    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        <a class="dropdown-item" href="javascript:document.getElementById('logoutForm').submit()">Log Out</a>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="main-content-inner">
+                @RenderBody()
+            </div>
+        </div>
         <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+            <div class="footer-area">
+                <p>© Copyright 2018. All right reserved. Template by <a href="https://colorlib.com/wp/">Colorlib</a>.</p>
+            </div>
         </footer>
     </div>
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/Scripts/assets/js")
+
+    <!-- start chart js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+    <!-- start highcharts js -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <!-- start amcharts -->
+    <script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
+    <script src="https://www.amcharts.com/lib/3/ammap.js"></script>
+    <script src="https://www.amcharts.com/lib/3/maps/js/worldLow.js"></script>
+    <script src="https://www.amcharts.com/lib/3/serial.js"></script>
+    <script src="https://www.amcharts.com/lib/3/plugins/export/export.min.js"></script>
+    <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
+    
+
+    @RenderSection("DataTableScripts",required: false)
+
+    <script src="~/Scripts/assets/js/plugins.js"></script>
+    <script src="~/Scripts/assets/js/scripts.js"></script>
+
     @RenderSection("scripts", required: false)
 </body>
 </html>

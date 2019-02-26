@@ -1,0 +1,49 @@
+﻿@model DokterPraktekV3.Models.VM_PatientRegister
+
+@{
+    ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+}
+
+<div class="login-box ptb--100">
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <form>
+        <div class="login-form-head" style="padding-top:25px;padding-bottom:25px;">
+            <a href="#"><img src="~/Assets/images/icon/logo_esc.png" alt="logo" style="width:50%;height:50%;"></a>
+            <br />
+            <br />
+            <h4>Sign up</h4>
+            <p>Hello there, Sign up and Join with Us</p>
+        </div>
+        <div class="login-form-body">
+            <input type="hidden" name="DoctorID" class="doctorId" value="@Model.DoctorID" />
+            <div class="form-gp">
+                @Html.LabelFor(model => model.PatientNumber)
+                @Html.EditorFor(model => model.PatientNumber)
+                @Html.ValidationMessageFor(model => model.PatientName, "", new { @class = "text-danger" })
+                <i class="ti-user"></i>
+            </div>
+            <div class="form-gp">
+                <input class="form-control" name="DateSchedule" min="@ViewBag.BlockDate" placeholder="Booking Date" onfocus="(this.type='date')" onfocusout="(this.type='')">
+                @Html.ValidationMessageFor(model => model.DateSchedule, "", new { @class = "text-danger" })
+            </div>
+            <div class="submit-btn-area">
+                <button id="form_submit" type="submit">Submit <i class="ti-arrow-right"></i></button>
+            </div>
+        </div>
+    </form>
+}
+
+</div>
+@section Scripts {
+
+<script>
+    $(function() {
+        $("#PatientNumber").val("");
+    });
+</script>
+
+}

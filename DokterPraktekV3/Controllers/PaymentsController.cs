@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using DokterPraktekV3;
+using DokterPraktekV3.Models;
 
 namespace DokterPraktekV3.Controllers
 {
@@ -14,105 +15,200 @@ namespace DokterPraktekV3.Controllers
     {
         private DokterPraktekEntities db = new DokterPraktekEntities();
 
-        // GET: Payments
         public ActionResult Index()
-        {
-            return View(db.Payments.ToList());
-        }
-
-        // GET: Payments/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Payment payment = db.Payments.Find(id);
-            if (payment == null)
-            {
-                return HttpNotFound();
-            }
-            return View(payment);
-        }
-
-        // GET: Payments/Create
-        public ActionResult Create()
         {
             return View();
         }
 
-        // POST: Payments/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        public ActionResult Nota(int id)
+        {
+            var viewModel = new VM_Nota();
+
+            try
+            {
+                var dataMedicalHistory = db.MedicalHistories.Where(x => x.ID == id).FirstOrDefault();
+                viewModel.HistoryID = dataMedicalHistory.ID;
+                viewModel.CheckUpDate = dataMedicalHistory.CheckUpDate.ToString("dd-MM-yyyy");
+                viewModel.PatientName = dataMedicalHistory.Patient.Name;
+                viewModel.CheckUpPrice = dataMedicalHistory.CheckUpPrice;
+                viewModel.MedicinesPrice = GetMedicinesPrice(dataMedicalHistory.ID);
+                viewModel.Amount = GetPatientTotalFee(dataMedicalHistory.ID);
+                viewModel.Paid = GetPatientLatestPayment(dataMedicalHistory.ID);
+                viewModel.PatientMedicines = new List<VM_PatientMedicine>();
+
+                foreach (var med in dataMedicalHistory.PatientMedicines)
+                {
+                    var obj = new VM_PatientMedicine();
+                    obj.MedicineName = med.Medicine.Name;
+                    obj.MedicineQuantity = med.Quantity;
+                    obj.ExpiredDate = med.Medicine.ExpireDate.ToString("dd-MM-yyyy");
+                    obj.Dose = med.Description;
+
+                    viewModel.PatientMedicines.Add(obj);
+                }
+            }
+            catch(Exception ex)
+            {
+
+            }
+            
+
+            return View(viewModel);
+        }
+
+        public JsonResult GetPatientPaymentsList()
+        {
+            List<VM_Payment> viewModel = new List<VM_Payment>();
+
+            var data = db.MedicalHistories.ToList();
+
+            if (data != null)
+            {
+                foreach (var item in data)
+                {
+                    VM_Payment model = new VM_Payment();
+                    model.PatientName = item.Patient.Name;
+                    model.DoctorName = item.Doctor.Name;
+                    model.MedicalHistoryId = item.ID;
+                    model.AppointmentDate = item.CheckUpDate.ToString("dd-MM-yyy");
+                    var checkUpPrice = item.CheckUpPrice;
+                    var medicinesPrice = item.PatientMedicines.Sum(x => x.Medicine.Price * x.Quantity);
+                    var totalFee = checkUpPrice + medicinesPrice;
+                    var paymentList = db.Payments.Where(x => x.MedicalHistoryID == item.ID).ToList();
+                    decimal feePaid = 0;
+                    if (paymentList != null)
+                    {
+                        feePaid = paymentList.Sum(x => x.Amount);
+                    }
+
+                    model.Amount = totalFee - feePaid;
+
+                    if (model.Amount > 0)
+                    {
+                        model.Status = "Belum lunas";
+                    }
+                    else
+                    {
+                        model.Status = "Lunas";
+                    }
+
+                    viewModel.Add(model);
+                }
+            }
+
+            return Json(new { data = viewModel }, JsonRequestBehavior.AllowGet);
+        }
+
+        private decimal GetPatientLatestPayment(int medicalHistoryId)
+        {
+            var payment = db.Payments.Where(x => x.MedicalHistoryID == medicalHistoryId).ToList();
+
+            decimal latestPayment = payment.Last().Amount;
+
+            return latestPayment;
+        }
+
+        private decimal GetMedicinesPrice(int medicalHistoryId)
+        {
+            var medicines = db.PatientMedicines.Where(x => x.MedicalHistoryID == medicalHistoryId).ToList();
+
+            decimal medicinePrice = medicines.Sum(x => x.Medicine.Price);
+
+            return medicinePrice;
+        }
+
+        private decimal GetPatientPaidAmount(int medicalHistoryId)
+        {
+            var paymentList = db.Payments.Where(x => x.MedicalHistoryID == medicalHistoryId).ToList();
+            decimal feePaid = 0;
+            if (paymentList != null)
+            {
+                feePaid = paymentList.Sum(x => x.Amount);
+            }
+
+            return feePaid;
+        }
+
+        private decimal GetPatientTotalFee(int medicalHistoryId)
+        {
+            var data = db.MedicalHistories.Where(x => x.ID == medicalHistoryId).FirstOrDefault();
+            decimal paidAmt = 0;
+            if (data != null)
+            {
+                var checkUpPrice = data.CheckUpPrice;
+                var medicinesPrice = data.PatientMedicines.Sum(x => x.Medicine.Price * x.Quantity);
+                var totalFee = checkUpPrice + medicinesPrice;
+                decimal feePaid = 0;
+                var paymentList = db.Payments.Where(x => x.MedicalHistoryID == medicalHistoryId).ToList();
+                if (paymentList != null)
+                {
+                    feePaid = paymentList.Sum(x => x.Amount);
+                }
+                paidAmt = totalFee - feePaid;
+            }
+
+            return paidAmt;
+
+        }
+
+        public JsonResult GetPaymentDetails(int medicalHistoryId)
+        {
+            VM_Payment vm = new VM_Payment();
+
+            var model = db.MedicalHistories.Where(x => x.ID == medicalHistoryId).FirstOrDefault();
+            
+            if (model != null)
+            {
+                vm.PatientName = model.Patient.Name;
+                vm.MedicalHistoryId = model.ID;
+                var checkUpPrice = model.CheckUpPrice;
+                var medicinesPrice = model.PatientMedicines.Sum(x => x.Medicine.Price * x.Quantity);
+                var totalFee = checkUpPrice + medicinesPrice;
+                var paymentList = db.Payments.Where(x => x.MedicalHistoryID == model.ID).ToList();
+                decimal feePaid = 0;
+                if (paymentList != null)
+                {
+                    feePaid = paymentList.Sum(x => x.Amount);
+                }
+
+                vm.TotalFee = totalFee - feePaid;
+            }
+
+            return Json(vm);
+        }
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,MedicalHistoryID,Amount")] Payment payment)
+        public JsonResult Pay(VM_Payment viewModel)
         {
-            if (ModelState.IsValid)
+            bool flag = false;
+            try
             {
-                db.Payments.Add(payment);
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
+                if (viewModel != null)
+                {
+                    var model = new Payment();
 
-            return View(payment);
-        }
+                    model.MedicalHistoryID = viewModel.MedicalHistoryId;
+                    model.Amount = viewModel.Amount;
 
-        // GET: Payments/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Payment payment = db.Payments.Find(id);
-            if (payment == null)
-            {
-                return HttpNotFound();
-            }
-            return View(payment);
-        }
+                    db.Payments.Add(model);
+                    db.SaveChanges();
 
-        // POST: Payments/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ID,MedicalHistoryID,Amount")] Payment payment)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Entry(payment).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                    flag = true;
+                }
             }
-            return View(payment);
-        }
-
-        // GET: Payments/Delete/5
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
+            catch(Exception ex)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                flag = false;
             }
-            Payment payment = db.Payments.Find(id);
-            if (payment == null)
+            
+            if (flag)
             {
-                return HttpNotFound();
+                return Json(new { success = true, responseText = "Add Success." }, JsonRequestBehavior.AllowGet);
             }
-            return View(payment);
-        }
-
-        // POST: Payments/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Payment payment = db.Payments.Find(id);
-            db.Payments.Remove(payment);
-            db.SaveChanges();
-            return RedirectToAction("Index");
+            else
+            {
+                return Json(new { success = false, responseText = "Add Failed." }, JsonRequestBehavior.AllowGet);
+            }
         }
 
         protected override void Dispose(bool disposing)

@@ -26,21 +26,20 @@ namespace DokterPraktekV3
         }
     
         public virtual DbSet<C__MigrationHistory> C__MigrationHistory { get; set; }
+        public virtual DbSet<Admin> Admins { get; set; }
         public virtual DbSet<AspNetRole> AspNetRoles { get; set; }
         public virtual DbSet<AspNetUserClaim> AspNetUserClaims { get; set; }
         public virtual DbSet<AspNetUserLogin> AspNetUserLogins { get; set; }
         public virtual DbSet<AspNetUser> AspNetUsers { get; set; }
+        public virtual DbSet<Doctor> Doctors { get; set; }
         public virtual DbSet<MedicalHistory> MedicalHistories { get; set; }
         public virtual DbSet<Medicine> Medicines { get; set; }
         public virtual DbSet<MedicineTransaction> MedicineTransactions { get; set; }
         public virtual DbSet<Patient> Patients { get; set; }
         public virtual DbSet<PatientMedicine> PatientMedicines { get; set; }
-        public virtual DbSet<PatientPicture> PatientPictures { get; set; }
         public virtual DbSet<Payment> Payments { get; set; }
         public virtual DbSet<Schedule> Schedules { get; set; }
-        public virtual DbSet<Specialist> Specialists { get; set; }
-        public virtual DbSet<WorkSchedule> WorkSchedules { get; set; }
-        public virtual DbSet<DoctorSpecialist> DoctorSpecialists { get; set; }
         public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
+        public virtual DbSet<WorkSchedule> WorkSchedules { get; set; }
     }
 }

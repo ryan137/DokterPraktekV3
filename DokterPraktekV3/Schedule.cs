@@ -15,13 +15,13 @@ namespace DokterPraktekV3
     public partial class Schedule
     {
         public int ID { get; set; }
-        public string DoctorID { get; set; }
+        public int DoctorID { get; set; }
         public int PatientID { get; set; }
         public System.DateTime DateSchedule { get; set; }
         public string BookingStatus { get; set; }
         public Nullable<int> BookingNumber { get; set; }
     
-        public virtual AspNetUser AspNetUser { get; set; }
+        public virtual Doctor Doctor { get; set; }
         public virtual Patient Patient { get; set; }
     }
 }

@@ -1,0 +1,257 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section DataTableStyleSheets{
+
+    <link href="~/Content/assets/datatable/css/jquery.dataTables.css" rel="stylesheet" />
+    <link href="~/Content/assets/datatable/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/assets/datatable/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/assets/datatable/css/responsive.jqueryui.min.css" rel="stylesheet" />
+
+}
+
+<div class="row">
+    <!-- Dark table start -->
+    <div class="col-12 mt-5">
+        <div class="card">
+            <div class="card-body">
+                <button class="btn btn-default btnAddMedicine" style="margin-bottom:5px;" data-toggle="modal" data-target="#medicineAddModal">Add Medicine</button>
+                <div class="data-tables datatable-dark">
+                    <table class="text-center medicineListDataTable">
+                        <thead class="text-capitalize">
+                            <tr>
+                                <th>Medicine Name</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Expire Date</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Dark table end -->
+
+    <!-- Add Modal -->
+    <div class="modal fade" id="medicineAddModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12 col-ml-12">
+                            <!-- Textual inputs start -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <input type="hidden" id="aDoctorId" />
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">Medicine Name</label>
+                                        <input class="form-control" type="text" id="aMedicineName">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">Price</label>
+                                        <input class="form-control" type="text" id="aMedicinePrice">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">Quantity</label>
+                                        <input class="form-control" type="number" id="aMedicineQuantity">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">Expire Date</label>
+                                        <input class="form-control" type="date" id="aExpireDate">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Textual inputs end -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary aAddMedicineBtn">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal fade" id="medicineEditModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12 col-ml-12">
+                            <!-- Textual inputs start -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <input type="hidden" id="eMedicineId" />
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">Medicine Name</label>
+                                        <input class="form-control" type="text" id="eMedicineName">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">Price</label>
+                                        <input class="form-control" type="text" id="eMedicinePrice">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">Expire Date</label>
+                                        <input class="form-control" type="date" id="eExpireDate">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Textual inputs end -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary eEditMedicineBtn">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@section DataTableScripts{
+
+    <script src="~/Scripts/assets/datatable/js/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/assets/datatable/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/Scripts/assets/datatable/js/dataTables.responsive.min.js"></script>
+    <script src="~/Scripts/assets/datatable/js/responsive.bootstrap.min.js"></script>
+}
+
+
+
+@section Scripts{
+    <script>
+
+        $(document).ready(function () {
+            var table = $(".medicineListDataTable").DataTable({
+                "responsive": true,
+                "orderMulti": false, // for disable multiple column at once
+                "ajax": {
+                    "url": "/Medicines/GetDoctorMedicineList",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "MedicineName", "name": "MedicineName", "autoWidth": true },
+                    { "data": "MedicinePrice", "name": "MedicinePrice", "autoWidth": true },
+                    { "data": "Quantity", "name": "Quantity", "autoWidth": true },
+                    { "data": "ExpireDate", "name": "ExpireDate", "autoWidth": true },
+                    {
+                        "render": function (data, type, full, meta) {
+                            var returnStr =
+                                ' <a href="#" class="btnEditMedicine" data-id="' + full.MedicineId + '">Edit</a>'
+                            return returnStr;
+                        }
+                    }
+                ]
+            });
+
+            $(document).on('click', '.aAddMedicineBtn', function (e) {
+                var modal = $(this).closest('#medicineAddModal');
+                var viewModel = {
+                    DoctorId: modal.find("#aDoctorId").val(),
+                    MedicineName: modal.find("#aMedicineName").val(),
+                    MedicinePrice: modal.find("#aMedicinePrice").val(),
+                    Quantity: modal.find("#aMedicineQuantity").val(),
+                    ExpireDate: modal.find("#aExpireDate").val()
+                }
+
+                $.ajax({
+                    url: "AddMedicine",
+                    type: "POST",
+                    dataType: "json",
+                    data: { viewModel },
+                    success: function (result) {
+                        if (result.success) {
+                            modal.modal('toggle');
+                            table.ajax.reload();
+                        }
+                        else {
+                            swal("Error", "Invalid data", "error")
+                        }
+                    },
+                    error: function () {
+                        swal("Error", "Request failed", "error")
+                    }
+                })
+            });
+
+            $(document).on('click', '.btnAddMedicine', function (e) {
+                var modal = $('#medicineAddModal');
+                
+                modal.find("#aDoctorId").val(""),
+                modal.find("#aMedicineName").val(""),
+                modal.find("#aMedicinePrice").val(""),
+                modal.find("#aMedicineQuantity").val(""),
+                modal.find("#aExpireDate").val("")
+
+            });
+            
+            $(document).on('click', '.btnEditMedicine', function (e) {
+                e.preventDefault();
+
+                var medId = $(this).attr("data-id");
+                $.ajax({
+                    url: "GetMedicineDetails",
+                    type: "POST",
+                    dataType: "json",
+                    data: { id: medId },
+                    success: function (result) {
+                        $("#medicineEditModal").find("#eMedicineId").val(result.MedicineId);
+                        $("#medicineEditModal").find("#eMedicineName").val(result.MedicineName);
+                        $("#medicineEditModal").find("#eMedicinePrice").val(result.MedicinePrice);
+                        $("#medicineEditModal").find("#eExpireDate").val("");
+                        $("#medicineEditModal").modal();
+                    }
+                })
+            });
+
+            $(document).on('click', '.eEditMedicineBtn', function (e) {
+                var modal = $(this).closest('#medicineEditModal');
+                var viewModel = {
+                    MedicineId: modal.find("#eMedicineId").val(),
+                    MedicineName: modal.find("#eMedicineName").val(),
+                    MedicinePrice: modal.find("#eMedicinePrice").val(),
+                    ExpDate: modal.find("#eExpireDate").val()
+                }
+
+                $.ajax({
+                    url: "EditMedicine",
+                    type: "POST",
+                    dataType: "json",
+                    data: { viewModel },
+                    success: function (result) {
+                        if (result.success) {
+                            modal.modal('toggle');
+                            table.ajax.reload();
+                        }
+                        else {
+                            swal("Error", "Invalid data", "error")
+                        }
+                    },
+                    error: function () {
+                        swal("Error", "Request failed", "error")
+                    }
+                })
+            });
+        });
+      
+    </script>
+
+}

@@ -1,39 +1,175 @@
-﻿@model IEnumerable<DokterPraktekV3.Payment>
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section DataTableStyleSheets{
 
-@{
-    ViewBag.Title = "Index";
+    <link href="~/Content/assets/datatable/css/jquery.dataTables.css" rel="stylesheet" />
+    <link href="~/Content/assets/datatable/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/assets/datatable/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/assets/datatable/css/responsive.jqueryui.min.css" rel="stylesheet" />
+
+}
+<div class="row">
+    <!-- Dark table start -->
+    <div class="col-12 mt-5">
+        <div class="card">
+            <div class="card-body">
+                <div class="data-tables datatable-dark">
+                    <table class="text-center paymentPatientListDataTable">
+                        <thead class="text-capitalize">
+                            <tr>
+                                <th>Patient Name</th>
+                                <th>Doctor Name</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Dark table end -->
+    <!-- Edit Modal -->
+    <div class="modal fade" id="paymentModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Payment</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12 col-ml-12">
+                            <!-- Textual inputs start -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <input type="hidden" id="aMedicalHistoryId" />
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">Name</label>
+                                        <input class="form-control" type="text" id="aPatientName" readonly="readonly">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">Total Fee</label>
+                                        <input class="form-control" type="text" id="aTotalFee" readonly="readonly">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">Amount</label>
+                                        <input class="form-control" type="text" id="aAmount">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Textual inputs end -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary aPayBtn">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section DataTableScripts{
+
+    <script src="~/Scripts/assets/datatable/js/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/assets/datatable/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/Scripts/assets/datatable/js/dataTables.responsive.min.js"></script>
+    <script src="~/Scripts/assets/datatable/js/responsive.bootstrap.min.js"></script>
 }
 
-<h2>Index</h2>
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.MedicalHistoryID)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Amount)
-        </th>
-        <th></th>
-    </tr>
+@section Scripts{
+    <script>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.MedicalHistoryID)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Amount)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
-        </td>
-    </tr>
+        $(document).ready(function () {
+            $(".titlePage").text("Payment");
+            var table = $(".paymentPatientListDataTable").DataTable({
+                "responsive": true,
+                "orderMulti": false, // for disable multiple column at once
+                "ajax": {
+                    "url": "/Payments/GetPatientPaymentsList",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "PatientName", "name": "PatientName", "autoWidth": true },
+                    { "data": "DoctorName", "name": "DoctorName", "autoWidth": true },
+                    { "data": "Amount", "name": "Amount", "autoWidth": true },
+                    { "data": "Status", "name": "Status", "autoWidth": true },
+                    { "data": "AppointmentDate", "name": "AppointmentDate", "autoWidth": true },
+                    {
+                        "render": function (data, type, full, meta) {
+                            var returnStr = "";
+                            if (full.Status != "Lunas") {
+                                returnStr =
+                                    ' <a href="#" class="btnPay" data-id="' + full.MedicalHistoryId + '">Pay</a>';
+                            }
+                            return returnStr;
+                        }
+                    }
+                ]
+            });
+
+            $(document).on('click', '.btnPay', function (e) {
+                e.preventDefault();
+
+                var medId = $(this).attr("data-id");
+                $.ajax({
+                    url: "/Payments/GetPaymentDetails",
+                    type: "POST",
+                    dataType: "json",
+                    data: { medicalHistoryId: medId },
+                    success: function (result) {
+                        $("#paymentModal").find("#aMedicalHistoryId").val(result.MedicalHistoryId);
+                        $("#paymentModal").find("#aPatientName").val(result.PatientName);
+                        $("#paymentModal").find("#aTotalFee").val(result.TotalFee);
+                        $("#paymentModal").find("#aAmount").val("");
+                        $("#paymentModal").modal();
+                    }
+                })
+            });
+
+            $(document).on('click', '.aPayBtn', function (e) {
+                var modal = $(this).closest('#paymentModal');
+                var medHistoryId = modal.find("#aMedicalHistoryId").val();
+
+                var viewModel = {
+                    MedicalHistoryId: modal.find("#aMedicalHistoryId").val(),
+                    Amount: modal.find("#aAmount").val()
+                }
+
+                $.ajax({
+                    url: "/Payments/Pay",
+                    type: "POST",
+                    dataType: "json",
+                    data: { viewModel },
+                    success: function (result) {
+                        if (result.success) {
+                            modal.modal('toggle');
+                            table.ajax.reload();
+
+                            var url = "http://localhost:55416/Payments/Nota/" + medHistoryId;
+                            var printWindow = window.open(url, 'Print', 'left=200, top=200, width=950, height=500, toolbar=0, resizable=0');
+                            printWindow.addEventListener('load', function () {
+                                printWindow.print();
+                                printWindow.close();
+                            }, true);
+                        }
+                        else {
+                            swal("Error", "Invalid data", "error")
+                        }
+                    },
+                    error: function (){
+                        swal("Error", "Request failed", "error")
+                    }
+                })
+            });
+        });
+    </script>
+
 }
-
-</table>

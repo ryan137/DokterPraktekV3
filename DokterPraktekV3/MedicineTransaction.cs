@@ -16,11 +16,12 @@ namespace DokterPraktekV3
     {
         public int ID { get; set; }
         public int MedicineID { get; set; }
-        public string DoctorID { get; set; }
+        public int DoctorID { get; set; }
         public bool TransactionStatus { get; set; }
         public int Quantity { get; set; }
+        public System.DateTime TransactionDate { get; set; }
     
-        public virtual AspNetUser AspNetUser { get; set; }
+        public virtual Doctor Doctor { get; set; }
         public virtual Medicine Medicine { get; set; }
     }
 }

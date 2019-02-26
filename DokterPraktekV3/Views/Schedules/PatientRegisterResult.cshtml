@@ -1,0 +1,46 @@
+﻿@model DokterPraktekV3.Schedule
+
+@{
+    ViewBag.Title = "PatientRegisterResult";
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+}
+
+
+<div class="login-box ptb--100">
+    <form>
+        <div class="login-form-head" style="padding-top:25px;padding-bottom:25px;">
+            <a href="#"><img src="~/Assets/images/icon/logo_esc.png" alt="logo" style="width:50%;height:50%;"></a>
+            <br />
+            <br />
+            <h4>Success</h4>
+            <p>Register Success</p>
+        </div>
+        <div class="login-form-body">
+            <div class="form-group">
+                @Html.LabelFor(model => model.BookingNumber, new { @class = "col-form-label" }) 
+                @Html.TextBoxFor(model => model.BookingNumber, new { @class = "form-control", @readonly = "readonly" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.PatientID, new { @class = "col-form-label" })
+                @Html.TextBoxFor(model => model.PatientID, new { @class = "form-control", @readonly = "readonly" })
+                <strong class="alert-danger">Use this Patient ID for your next booking</strong>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.Patient.Name, new { @class = "col-form-label" })
+                @Html.TextBoxFor(model => model.Patient.Name, new { @class = "form-control", @readonly = "readonly" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.Doctor.Name, new { @class = "col-form-label" })
+                @Html.TextBoxFor(model => model.Doctor.Name, new { @class = "form-control", @readonly = "readonly" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.DateSchedule, new { @class = "col-form-label" })
+                @Html.TextBoxFor(model => model.DateSchedule, new { @class = "form-control", @readonly = "readonly" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.BookingStatus, new { @class = "col-form-label" })
+                @Html.TextBoxFor(model => model.BookingStatus, new { @class = "form-control", @readonly = "readonly" })
+            </div>
+        </div>
+    </form>
+</div>

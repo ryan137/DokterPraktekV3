@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DokterPraktekV3.Models;
+using Microsoft.AspNet.Identity;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
@@ -13,105 +15,174 @@ namespace DokterPraktekV3
     {
         private DokterPraktekEntities db = new DokterPraktekEntities();
 
-        // GET: Medicines
-        public ActionResult Index()
-        {
-            return View(db.Medicines.ToList());
-        }
-
-        // GET: Medicines/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Medicine medicine = db.Medicines.Find(id);
-            if (medicine == null)
-            {
-                return HttpNotFound();
-            }
-            return View(medicine);
-        }
-
-        // GET: Medicines/Create
-        public ActionResult Create()
+        public ActionResult MedicineList()
         {
             return View();
         }
 
-        // POST: Medicines/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,DoctorID,Name,Price,Quantity,DateIn,ExpireDate")] Medicine medicine)
+        public JsonResult AddMedicine(VM_Medicine viewModel)
         {
-            if (ModelState.IsValid)
+            bool flag = false;
+            try
             {
-                db.Medicines.Add(medicine);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                if (viewModel != null)
+                {
+                    var model = new Medicine();
+                    var medTransModel = new MedicineTransaction();
+                    var userId = User.Identity.GetUserId();
+                    var doctorId = db.Doctors.FirstOrDefault(x => x.UserID == userId).ID;
+
+                    if (doctorId > 0)
+                    {
+                        model.DoctorID = doctorId;
+                        model.Name = viewModel.MedicineName;
+                        model.Price = viewModel.MedicinePrice;
+                        model.Quantity = viewModel.Quantity;
+                        model.DateIn = DateTime.Now;
+                        model.ExpireDate = Convert.ToDateTime(viewModel.ExpireDate);
+
+                        db.Medicines.Add(model);
+                        db.SaveChanges();
+
+                        medTransModel.DoctorID = doctorId;
+                        medTransModel.MedicineID = model.ID;
+                        medTransModel.Quantity = model.Quantity;
+                        medTransModel.TransactionStatus = true;
+                        medTransModel.TransactionDate = DateTime.Now;
+
+                        db.MedicineTransactions.Add(medTransModel);
+                        db.SaveChanges();
+
+                        flag = true;
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                flag = false;
             }
 
-            return View(medicine);
+            if (flag)
+            {
+                return Json(new { success = true, responseText = "Add Success" }, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(new { success = false, responseText = "Add Failed"}, JsonRequestBehavior.AllowGet);
+            }
         }
 
-        // GET: Medicines/Edit/5
-        public ActionResult Edit(int? id)
+        public JsonResult GetDoctorMedicineList()
         {
-            if (id == null)
+            List<VM_Medicine> viewModel = new List<VM_Medicine>();
+
+            var userId = User.Identity.GetUserId();
+            var doctor = db.Doctors.FirstOrDefault(x => x.UserID == userId);
+
+            if (doctor != null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                var medicineList = db.Medicines.Where(x => x.DoctorID == doctor.ID).ToList();
+
+                foreach (var med in medicineList)
+                {
+                    var vm = new VM_Medicine();
+                    vm.MedicineId = med.ID;
+                    vm.MedicineName = med.Name;
+                    vm.MedicinePrice = med.Price;
+                    vm.Quantity = GetMedcineQuantity(med.ID);
+                    vm.ExpireDate = med.ExpireDate.ToString("dd-MM-yyyy");
+
+                    viewModel.Add(vm);
+                }
+
             }
-            Medicine medicine = db.Medicines.Find(id);
-            if (medicine == null)
-            {
-                return HttpNotFound();
-            }
-            return View(medicine);
+
+            return Json(new { data = viewModel }, JsonRequestBehavior.AllowGet);
         }
 
-        // POST: Medicines/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        public JsonResult GetMedicineDetails(int id)
+        {
+            VM_Medicine viewModel = new VM_Medicine();
+            
+            if (id != 0)
+            {
+                var medicineModel = db.Medicines.Where(x => x.ID == id).FirstOrDefault();
+                
+                if (medicineModel != null)
+                {
+                    viewModel.MedicineId = medicineModel.ID;
+                    viewModel.MedicineName = medicineModel.Name;
+                    viewModel.MedicinePrice = medicineModel.Price;
+                    viewModel.Quantity = medicineModel.Quantity;
+                    viewModel.ExpireDate = medicineModel.ExpireDate.ToString("yyyy-mm-dd");
+                }
+            }
+
+            return Json(viewModel);
+        }
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ID,DoctorID,Name,Price,Quantity,DateIn,ExpireDate")] Medicine medicine)
+        public JsonResult EditMedicine(VM_Medicine viewModel)
         {
-            if (ModelState.IsValid)
+            bool flag = false;
+
+            try
             {
-                db.Entry(medicine).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                if (viewModel != null)
+                {
+                    var model = new Medicine();
+
+                    model = db.Medicines.FirstOrDefault(x => x.ID == viewModel.MedicineId);
+
+                    if (model != null)
+                    {
+                        model.Name = viewModel.MedicineName;
+                        model.Price = viewModel.MedicinePrice;
+                        model.ExpireDate = viewModel.ExpDate;
+
+                        db.SaveChanges();
+
+                        flag = true;
+                    }
+                }
             }
-            return View(medicine);
+            catch (Exception ex)
+            {
+                flag = false;
+            }
+            
+
+            if (flag)
+            {
+                return Json(new { success = true, responseText = "Edit Success." }, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(new { success = false, responseText = "Edit Failed." }, JsonRequestBehavior.AllowGet);
+            }
         }
 
-        // GET: Medicines/Delete/5
-        public ActionResult Delete(int? id)
+        private int GetMedcineQuantity(int medicineId)
         {
-            if (id == null)
+            try
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Medicine medicine = db.Medicines.Find(id);
-            if (medicine == null)
-            {
-                return HttpNotFound();
-            }
-            return View(medicine);
-        }
+                int qty;
 
-        // POST: Medicines/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Medicine medicine = db.Medicines.Find(id);
-            db.Medicines.Remove(medicine);
-            db.SaveChanges();
-            return RedirectToAction("Index");
+                var inQty = db.MedicineTransactions.Where(x => x.MedicineID == medicineId && x.TransactionStatus == true).ToList();
+                var outQty = db.MedicineTransactions.Where(x => x.MedicineID == medicineId && x.TransactionStatus == false).ToList();
+
+                var dataIn = inQty != null ? inQty.Sum(x => x.Quantity) : 0;
+                var dataOut = outQty != null ? outQty.Sum(x => x.Quantity) : 0;
+
+                qty = dataIn - dataOut; 
+
+                return qty;
+            }
+            catch(Exception ex)
+            {
+                return 0;
+            }
         }
 
         protected override void Dispose(bool disposing)

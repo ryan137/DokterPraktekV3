@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using DokterPraktekV3.Models;
+using System.Collections.Generic;
 
 namespace DokterPraktekV3.Controllers
 {
@@ -53,6 +54,25 @@ namespace DokterPraktekV3.Controllers
             }
         }
 
+        [HttpPost]
+        public JsonResult DeleteUser(string id)
+        {
+            if (!String.IsNullOrEmpty(id))
+            {
+                var data = db.AspNetUsers.FirstOrDefault(x => x.Id == id);
+
+                if (data != null)
+                {
+                    db.AspNetUsers.Remove(data);
+                    db.SaveChanges();
+
+                    return Json(new { success = true, responseText = "Delete Success." }, JsonRequestBehavior.AllowGet);
+                }
+            }
+
+            return Json(new { success = false, responseText = "Delete Failed." }, JsonRequestBehavior.AllowGet);
+        }
+
         //
         // GET: /Account/Login
         [AllowAnonymous]
@@ -69,6 +89,7 @@ namespace DokterPraktekV3.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
+            bool isActive;
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -76,21 +97,201 @@ namespace DokterPraktekV3.Controllers
 
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
-            switch (result)
+            var user = db.AspNetUsers.Where(x => x.Email == model.Email).FirstOrDefault();
+
+            if (user != null)
             {
-                case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
-                case SignInStatus.LockedOut:
-                    return View("Lockout");
-                case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
-                case SignInStatus.Failure:
-                default:
+                var role = db.AspNetRoles.FirstOrDefault(x => x.AspNetUsers.FirstOrDefault(c => c.Id == user.Id) != null);
+                if (role.Name == "Admin")
+                {
+                    isActive = db.Admins.FirstOrDefault(x => x.UserID == user.Id).IsActive;
+                }
+                else if (role.Name == "Doctor")
+                {
+                    isActive = db.Doctors.FirstOrDefault(x => x.UserID == user.Id).IsActive;
+                }
+                else
+                {
+                    isActive = true;
+                }
+
+                if (isActive)
+                {
+                    var result = await SignInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, shouldLockout: false);
+                    switch (result)
+                    {
+                        case SignInStatus.Success:
+                            return RedirectToLocal(role.Name);
+                        case SignInStatus.LockedOut:
+                            return View("Lockout");
+                        case SignInStatus.RequiresVerification:
+                            return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                        case SignInStatus.Failure:
+                        default:
+                            ModelState.AddModelError("", "Invalid login attempt.");
+                            return View(model);
+                    }
+                }
+                else
+                {
                     ModelState.AddModelError("", "Invalid login attempt.");
                     return View(model);
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "Invalid login attempt.");
+                return View(model);
             }
         }
+
+        //
+        // GET: /Account/Register
+        [AllowAnonymous]
+        public ActionResult Register()
+        {
+            // GET: Roles
+            var viewModel = new RegisterViewModel();
+            viewModel.Roles = db.AspNetRoles
+                .OrderBy(x => x.Id)
+                .Select(x => new SelectListItem
+                {
+                    Value = x.Id,
+                    Text = x.Name
+                }).ToList();
+
+            viewModel.Genders = new List<SelectListItem>()
+            {
+                new SelectListItem()
+                {
+                    Value = "Male",
+                    Text = "Male"
+                },
+                new SelectListItem()
+                {
+                    Value = "Female",
+                    Text = "Female"
+                }
+            };
+
+            return View(viewModel);
+        }
+
+        //
+        // POST: /Account/Register
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Register(RegisterViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
+                var result = await UserManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    var roleResult = await UserManager.AddToRoleAsync(user.Id, db.AspNetRoles.Where(x => x.Id == model.SelectedRole).Select(x => x.Name).First());
+                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
+                    // Send an email with this link
+                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+
+                    if (roleResult.Succeeded)
+                    {
+                        if (model.SelectedRole == "2")
+                        {
+                            var obj = new Doctor()
+                            {
+                                Name = model.UserName,
+                                UserID = user.Id,
+                                Address = model.Address,
+                                PhoneNumber = model.PhoneNumber,
+                                Gender = model.Gender.Equals("Male") ? true : false,
+                                IsActive = true,
+                            };
+
+                            obj = db.Doctors.Add(obj);
+
+                            var listWorkSch = new List<WorkSchedule>()
+                            {
+                                new WorkSchedule()
+                                {
+                                    DoctorID = obj.ID,
+                                    Day = "Monday",
+                                    IsAvailable = true,
+                                },
+                                new WorkSchedule()
+                                {
+                                    DoctorID = obj.ID,
+                                    Day = "Tuesday",
+                                    IsAvailable = true,
+                                },
+                                new WorkSchedule()
+                                {
+                                    DoctorID = obj.ID,
+                                    Day = "Wednesday",
+                                    IsAvailable = true,
+                                },
+                                new WorkSchedule()
+                                {
+                                    DoctorID = obj.ID,
+                                    Day = "Thursday",
+                                    IsAvailable = true,
+                                },
+                                new WorkSchedule()
+                                {
+                                    DoctorID = obj.ID,
+                                    Day = "Friday",
+                                    IsAvailable = true,
+                                },
+                                new WorkSchedule()
+                                {
+                                    DoctorID = obj.ID,
+                                    Day = "Saturday",
+                                    IsAvailable = true,
+                                },
+                                new WorkSchedule()
+                                {
+                                    DoctorID = obj.ID,
+                                    Day = "Sunday",
+                                    IsAvailable = true,
+                                }
+                            };
+
+                            foreach (var day in listWorkSch)
+                            {
+                                db.WorkSchedules.Add(day);
+                            }
+
+                            db.SaveChanges();
+                        }
+                        else if (model.SelectedRole == "3")
+                        {
+                            var obj = new Admin()
+                            {
+                                Name = model.UserName,
+                                UserID = user.Id,
+                                Address = model.Address,
+                                PhoneNumber = model.PhoneNumber,
+                                Gender = model.Gender.Equals("Male") ? true : false,
+                                IsActive = true,
+                            };
+
+                            db.Admins.Add(obj);
+                            db.SaveChanges();
+                        }
+                        return RedirectToAction("Register", "Account");
+                    }
+
+                }
+                AddErrors(result);
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
 
         //
         // GET: /Account/VerifyCode
@@ -121,7 +322,7 @@ namespace DokterPraktekV3.Controllers
             // If a user enters incorrect codes for a specified amount of time then the user account 
             // will be locked out for a specified amount of time. 
             // You can configure the account lockout settings in IdentityConfig
-            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent:  model.RememberMe, rememberBrowser: model.RememberBrowser);
+            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -133,53 +334,6 @@ namespace DokterPraktekV3.Controllers
                     ModelState.AddModelError("", "Invalid code.");
                     return View(model);
             }
-        }
-
-        //
-        // GET: /Account/Register
-        [AllowAnonymous]
-        public ActionResult Register()
-        {
-            // GET: Roles
-            var viewModel = new RegisterViewModel();
-            viewModel.Roles = db.AspNetRoles
-                .OrderBy(x => x.Id)
-                .Select(x => new SelectListItem
-                {
-                    Value = x.Id,
-                    Text = x.Name
-                }).ToList();
-            return View(viewModel);
-        }
-
-        //
-        // POST: /Account/Register
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Register(RegisterViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                var result = await UserManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    await UserManager.AddToRoleAsync(user.Id, db.AspNetRoles.Where(x => x.Id == model.SelectedRole).Select(x => x.Name).First());
-                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
-
-                    return RedirectToAction("Index", "Home");
-                }
-                AddErrors(result);
-            }
-
-            // If we got this far, something failed, redisplay form
-            return View(model);
         }
 
         //
@@ -402,7 +556,7 @@ namespace DokterPraktekV3.Controllers
         public ActionResult LogOff()
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login", "Account");
         }
 
         //
@@ -455,11 +609,23 @@ namespace DokterPraktekV3.Controllers
 
         private ActionResult RedirectToLocal(string returnUrl)
         {
-            if (Url.IsLocalUrl(returnUrl))
+            var role = returnUrl;
+            if (role == "Superuser")
             {
-                return Redirect(returnUrl);
+                return RedirectToAction("DoctorList", "Doctors");
             }
-            return RedirectToAction("Index", "Home");
+            else if (role == "Doctor")
+            {
+                return RedirectToAction("TodayBookList", "Schedules");
+            }
+            else if (role == "Admin")
+            {
+                return RedirectToAction("TodayBookList", "Schedules");
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         internal class ChallengeResult : HttpUnauthorizedResult

@@ -1,72 +1,62 @@
-﻿@model DokterPraktekV3.Schedule
+﻿@model DokterPraktekV3.Models.VM_PatientRegister
 
 @{
-    ViewBag.Title = "Create";
+    ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_Layout2.cshtml";
 }
 
-<h2>Create</h2>
-
-
-@using (Html.BeginForm()) 
+<div class="login-box ptb--100">
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
-    <div class="form-horizontal">
-        <h4>Schedule</h4>
-        <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        <div class="form-group">
-            @Html.LabelFor(model => model.DoctorID, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.DoctorID, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.DoctorID, "", new { @class = "text-danger" })
-            </div>
-        </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.PatientID, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.PatientID, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.PatientID, "", new { @class = "text-danger" })
-            </div>
+    <form>
+        <div class="login-form-head" style="padding-top:25px;padding-bottom:25px;">
+            <a href="#"><img src="~/Assets/images/icon/logo_esc.png" alt="logo" style="width:50%;height:50%;"></a>
+            <br />
+            <br />
+            <h4>Sign up</h4>
+            <p>Hello there, Sign up and Join with Us</p>
         </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.DateSchedule, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.DateSchedule, new { htmlAttributes = new { @class = "form-control" } })
+        <div class="login-form-body">
+            <input type="hidden" name="DoctorID" class="doctorId" value="@Model.DoctorID" />
+            <div class="form-gp">
+                @Html.LabelFor(model => model.PatientName)
+                @Html.EditorFor(model => model.PatientName)
+                @Html.ValidationMessageFor(model => model.PatientName, "", new { @class = "text-danger" })
+                <i class="ti-user"></i>
+            </div>
+            <div class="form-gp">
+                @Html.LabelFor(model => model.PatientAddress)
+                @Html.EditorFor(model => model.PatientAddress)
+                @Html.ValidationMessageFor(model => model.PatientAddress, "", new { @class = "text-danger" })
+                <i class="ti-home"></i>
+            </div>
+            <div class="form-gp">
+                @Html.LabelFor(model => model.PhoneNumber)
+                @Html.EditorFor(model => model.PhoneNumber)
+                @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger" })
+                <i class="ti-mobile"></i>
+            </div>
+            <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" checked="checked" value="True" id="customRadio4" name="Gender" class="custom-control-input">
+                <label class="custom-control-label" for="customRadio4">Male</label>
+            </div>
+            <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" value="False" id="customRadio5" name="Gender" class="custom-control-input">
+                <label class="custom-control-label" for="customRadio5">Female</label>
+            </div>
+            <br />
+            <br />
+            <div class="form-gp">
+                <input class="form-control" name="DateSchedule" placeholder="Booking Date" onfocus="(this.type='date')" onfocusout="(this.type='')">
                 @Html.ValidationMessageFor(model => model.DateSchedule, "", new { @class = "text-danger" })
             </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.BookingStatus, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.BookingStatus, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.BookingStatus, "", new { @class = "text-danger" })
+            <div class="submit-btn-area">
+                <button id="form_submit" type="submit">Submit <i class="ti-arrow-right"></i></button>
             </div>
         </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.BookingNumber, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.BookingNumber, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.BookingNumber, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
-        </div>
-    </div>
+    </form>
 }
 
-<div>
-    @Html.ActionLink("Back to List", "Index")
 </div>
-
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-}

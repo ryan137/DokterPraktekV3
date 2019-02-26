@@ -1,0 +1,72 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section DataTableStyleSheets{
+
+    <link href="~/Content/assets/datatable/css/jquery.dataTables.css" rel="stylesheet" />
+    <link href="~/Content/assets/datatable/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/assets/datatable/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/assets/datatable/css/responsive.jqueryui.min.css" rel="stylesheet" />
+
+}
+<div class="row">
+    <!-- Dark table start -->
+    <div class="col-12 mt-5">
+        <div class="card">
+            <div class="card-body">
+                <div class="data-tables datatable-dark">
+                    <table class="text-center allBookListDataTable">
+                        <thead class="text-capitalize">
+                            <tr>
+                                <th>Booking Number</th>
+                                <th>Doctor Name</th>
+                                <th>Patient Name</th>
+                                <th>Status</th>
+                                <th>Appointment Date</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Dark table end -->
+</div>
+
+
+@section DataTableScripts{
+
+    <script src="~/Scripts/assets/datatable/js/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/assets/datatable/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/Scripts/assets/datatable/js/dataTables.responsive.min.js"></script>
+    <script src="~/Scripts/assets/datatable/js/responsive.bootstrap.min.js"></script>
+}
+
+
+
+@section Scripts{
+    <script>
+
+        $(document).ready(function () {
+            $(".titlePage").text("All Book List");
+            var table = $(".allBookListDataTable").DataTable({
+                "responsive": true,
+                "ajax": {
+                    "url": "/Schedules/GetAllScheduleList",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "BookingNumber", "name": "BookingNumber", "autoWidth": true },
+                    { "data": "DoctorName", "name": "DoctorName", "autoWidth": true },
+                    { "data": "PatientName", "name": "PatientName", "autoWidth": true },
+                    { "data": "BookingStatus", "name": "BookingStatus", "autoWidth": true },
+                    { "data": "DateSchedule", "name": "DateSchedule", "autoWidth": true }
+                ]
+            });
+        });
+    </script>
+
+}

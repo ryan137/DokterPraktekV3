@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Dokter Praktek</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    @Styles.Render("~/Content/assets/css")
+    @Scripts.Render("~/bundles/Scripts/assets")
+    <style>
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            margin: 0; 
+        }
+    </style>
+</head>
+<body>
+    <!-- login area start -->
+    <div class="login-area">
+        <div class="container">
+            @RenderBody()
+        </div>
+    </div>
+    <!-- login area end -->
+    <footer>
+        <div class="footer-area">
+            <p>© Copyright 2018. All right reserved. Template by <a href="https://colorlib.com/wp/">Colorlib</a>.</p>
+        </div>
+    </footer>
+    @Scripts.Render("~/bundles/Scripts/assets/js")
+
+    @RenderSection("scripts", required: false)
+
+    <script src="~/Scripts/assets/js/plugins.js"></script>
+    <script src="~/Scripts/assets/js/scripts.js"></script>
+</body>
+</html>

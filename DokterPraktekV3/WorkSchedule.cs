@@ -16,9 +16,9 @@ namespace DokterPraktekV3
     {
         public int ID { get; set; }
         public string Day { get; set; }
-        public string DoctorID { get; set; }
+        public int DoctorID { get; set; }
         public bool IsAvailable { get; set; }
     
-        public virtual AspNetUser AspNetUser { get; set; }
+        public virtual Doctor Doctor { get; set; }
     }
 }

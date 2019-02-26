@@ -18,7 +18,6 @@ namespace DokterPraktekV3
         public Patient()
         {
             this.MedicalHistories = new HashSet<MedicalHistory>();
-            this.PatientPictures = new HashSet<PatientPicture>();
             this.Schedules = new HashSet<Schedule>();
         }
     
@@ -28,12 +27,9 @@ namespace DokterPraktekV3
         public string PhoneNumber { get; set; }
         public bool Gender { get; set; }
         public byte[] CreatedDate { get; set; }
-        public string Photo { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<MedicalHistory> MedicalHistories { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<PatientPicture> PatientPictures { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Schedule> Schedules { get; set; }
     }

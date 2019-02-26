@@ -1,0 +1,192 @@
+﻿@model DokterPraktekV3.Patient
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section DataTableStyleSheets{
+
+    <link href="~/Content/assets/datatable/css/jquery.dataTables.css" rel="stylesheet" />
+    <link href="~/Content/assets/datatable/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/assets/datatable/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/assets/datatable/css/responsive.jqueryui.min.css" rel="stylesheet" />
+
+}
+
+<div class="row">
+    <!-- Dark table start -->
+    <div class="col-12 mt-5">
+        <div class="card">
+            <div class="card-body patientHistorySection">
+                <div class="form-group col-md-4">
+                    @Html.LabelFor(model => model.Name)
+                    @Html.TextBoxFor(model => model.Name, new { @class = "form-control", @readonly = "readonly" })
+                </div>
+                <div class="form-group col-md-4">
+                    @Html.LabelFor(model => model.Address)
+                    @Html.TextBoxFor(model => model.Address, new { @class = "form-control", @readonly = "readonly" })
+                </div>
+                <div class="form-group col-md-4">
+                    @Html.LabelFor(model => model.Gender)
+                    @{ 
+                        if (Model.Gender == true)
+                        {
+                            <input type="text" class="form-control" readonly="readonly" value="Male" />
+                        }
+                        else
+                        {
+                            <input type="text" class="form-control" readonly="readonly" value="Female" />
+                        }
+                    }
+                </div>
+                <div class="form-group col-md-4">
+                    @Html.LabelFor(model => model.PhoneNumber)
+                    @Html.TextBoxFor(model => model.PhoneNumber, new { @class = "form-control", @readonly = "readonly" })
+                </div>
+                <div class="data-tables datatable-dark">
+                    <input type="hidden" id="hdnPatientId" value="@Model.ID" />
+                    <table class="text-center patientHistoryListDataTable">
+                        <thead class="text-capitalize">
+                            <tr>
+                                <th>Sickness</th>
+                                <th>Description</th>
+                                <th>Check Up Date</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div class="modal fade" id="patientHistoryDetailsModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Details</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12 col-ml-12">
+                            <!-- Textual inputs start -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">Sickness</label>
+                                        <input class="form-control" type="text" id="dPatientSickness" readonly="readonly">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">Description</label>
+                                        <input class="form-control" id="dPatientDescription" readonly="readonly"/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">Check Up Price</label>
+                                        <input class="form-control" type="text" id="dPatientCheckUpPrice" readonly="readonly">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">Check Up Date</label>
+                                        <input class="form-control" type="text" id="dPatientCheckUpDate" readonly="readonly">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Textual inputs end -->
+                            <div class="data-tables datatable-dark">
+                                <table class="text-center detailsMedicineListDataTable" style="width:100%">
+                                    <thead class="text-capitalize">
+                                        <tr>
+                                            <th>Medicine Name</th>
+                                            <th>Quantity</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section DataTableScripts{
+
+    <script src="~/Scripts/assets/datatable/js/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/assets/datatable/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/Scripts/assets/datatable/js/dataTables.responsive.min.js"></script>
+    <script src="~/Scripts/assets/datatable/js/responsive.bootstrap.min.js"></script>
+}
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $(".titlePage").text("Patient Details");
+
+            var patientId = $("#hdnPatientId").val();
+            var tableHistory = $(".patientHistoryListDataTable").DataTable({
+                "responsive": true,
+                "orderMulti": false, // for disable multiple column at once
+                "ajax": {
+                    "url": "/MedicalHistories/GetPatientMedicicalHistoryList",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": { patientId: patientId }
+                },
+                "columns": [
+                    { "data": "Sickness", "name": "Sickness", "autoWidth": true },
+                    { "data": "DescriptionInfo", "name": "DescriptionInfo", "autoWidth": true },
+                    { "data": "CheckUpDate", "name": "CheckUpDate", "autoWidth": true },
+                    {
+                        "render": function (data, type, full, meta) {
+                            var returnStr =
+                                ' <a href="#" class="btnPatientHistoryDetails" data-id="' + full.ID + '">Details</a>'
+                            return returnStr;
+                        }
+                    }
+                ]
+            });
+
+            var tableDetailsPatientMed = $(".detailsMedicineListDataTable").DataTable({
+                "responsive": true,
+                "orderMulti": false
+            });
+
+            $(document).on('click', '.btnPatientHistoryDetails', function (e) {
+                var medicalHistoryId = $(this).attr("data-id");
+                $.ajax({
+                    url: "GetPatientHistoryDetails",
+                    type: "POST",
+                    dataType: "json",
+                    data: { medicalHistoryId: medicalHistoryId },
+                    success: function (data) {
+                        $("#patientHistoryDetailsModal").find("#dPatientSickness").val(data.Sickness);
+                        $("#patientHistoryDetailsModal").find("#dPatientDescription").val(data.Description); 
+                        $("#patientHistoryDetailsModal").find("#dPatientCheckUpPrice").val(data.CheckUpPrice);
+                        $("#patientHistoryDetailsModal").find("#dPatientCheckUpDate").val(data.CheckUpDate);
+
+                        $(".detailsMedicineListDataTable").DataTable().clear().draw();
+
+                        for (var i = 0; i < data.PatientMedicines.length; i++) {
+
+                            tableDetailsPatientMed.row.add([
+                                data.PatientMedicines[i].MedicineName,
+                                data.PatientMedicines[i].MedicineQuantity,
+                                data.PatientMedicines[i].Dose
+                            ]).draw(false);
+                        }
+
+                        $("#patientHistoryDetailsModal").modal();
+                    }
+                })
+            });
+        })
+    </script>
+    }

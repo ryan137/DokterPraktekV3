@@ -1,0 +1,49 @@
+﻿@model DokterPraktekV3.Models.VM_Nota
+@{
+    Layout = null;
+}
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/Content/Nota.css" />
+</head>
+<body>
+    <h2>Number : @Model.HistoryID</h2>
+    <p>Date Checkup: @Model.CheckUpDate</p>
+    <p>Patient Name : @Model.PatientName</p>
+    @{
+        var a = Model.Amount;
+        var b = Model.Paid;
+        var c = a - b;
+    }
+
+    <table style="width:100%">
+        <thead>
+            <tr>
+                <th style="text-align: left;">Medicine Name</th>
+                <th style="text-align: left;">Quantity</th>
+                <th style="text-align: left;">Expired</th>
+                <th style="text-align: left;">Dosis</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var i in Model.PatientMedicines)
+            {
+                <tr>
+                    <td>@i.MedicineName</td>
+                    <td>@i.MedicineQuantity</td>
+                    <td>@i.ExpiredDate</td>
+                    <td>@i.Dose</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <p>Check Up     : @Model.CheckUpPrice</p>
+    <p>Medicines    : @Model.MedicinesPrice</p>
+    <p>Total Fee    : @Model.Amount</p>
+    <p>Paid Amount  : @Model.Paid</p>
+</body>
+</html>
+
+
+

@@ -1,0 +1,110 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    bool isUserDoctor = User.IsInRole("Doctor");
+}
+@section DataTableStyleSheets{
+
+    <link href="~/Content/assets/datatable/css/jquery.dataTables.css" rel="stylesheet" />
+    <link href="~/Content/assets/datatable/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/assets/datatable/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/assets/datatable/css/responsive.jqueryui.min.css" rel="stylesheet" />
+
+}
+<div class="row">
+    <!-- Dark table start -->
+    <div class="col-12 mt-5">
+        <div class="card">
+            <div class="card-body">
+                <div class="data-tables datatable-dark">
+                    <input type="hidden" id="isUserDoctor" value="@isUserDoctor" />
+                    <table class="text-center todayBookListDataTable">
+                        <thead class="text-capitalize">
+                            <tr>
+                                <th>Booking Number</th>
+                                <th>Patient Name</th>
+                                <th>Appointment Date</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Dark table end -->
+
+        
+</div>
+
+
+
+
+@section DataTableScripts{
+
+    <script src="~/Scripts/assets/datatable/js/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/assets/datatable/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/Scripts/assets/datatable/js/dataTables.responsive.min.js"></script>
+    <script src="~/Scripts/assets/datatable/js/responsive.bootstrap.min.js"></script>
+}
+
+@section Scripts{
+    <script>
+
+        $(document).ready(function () {
+            $(".titlePage").text("Today's Schedule");
+            var isUserDoctor = $("#isUserDoctor").val();
+            var table = $(".todayBookListDataTable").DataTable({
+                "responsive": true,
+                "orderMulti": false, // for disable multiple column at once
+                "ajax": {
+                    "url": "/Schedules/GetTodayScheduleList",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "order":[[4,'asc']],
+                "columns": [
+                    { "data": "BookingNumber", "name": "BookingNumber", "autoWidth": true },
+                    { "data": "PatientName", "name": "PatientName", "autoWidth": true },
+                    { "data": "DateSchedule", "name": "DateSchedule", "autoWidth": true },
+                    { "data": "BookingStatus", "name": "BookingStatus", "autoWidth": true },
+                    {
+                        "render": function (data, type, full, meta) {
+                            var returnStr = "";
+                            if (isUserDoctor && full.BookingStatus == "Booking"){
+                                returnStr =
+                                ' <a href="/Patients/PatientHistoryDetails?scheduleId='+ full.ScheduleId +'" >Input</a>'
+                            }
+                            else {
+                                if (full.BookingStatus == "Booking") {
+                                    returnStr =
+                                        ' <a href="#" class="btnScheduleCancel" data-id="' + full.ScheduleId + '">Cancel</a>'
+                                }
+                            }
+                            
+                            return returnStr;
+                        }
+                    }
+                ]
+            });
+
+            $(document).on('click', '.btnScheduleCancel', function (e) {
+                e.preventDefault();
+
+                var scheduleId = $(this).attr("data-id");
+
+                $.ajax({
+                    url: "CancelBooking",
+                    type: "POST",
+                    dataType: "json",
+                    data: { scheduleId: scheduleId },
+                    success: function (result) {
+                        table.ajax.reload();
+                    }
+                })
+            });
+        });
+    </script>
+
+}

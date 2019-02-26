@@ -1,0 +1,185 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    bool isUserDoctor = User.IsInRole("Doctor");
+}
+@section DataTableStyleSheets{
+
+    <link href="~/Content/assets/datatable/css/jquery.dataTables.css" rel="stylesheet" />
+    <link href="~/Content/assets/datatable/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/assets/datatable/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/assets/datatable/css/responsive.jqueryui.min.css" rel="stylesheet" />
+
+}
+<div class="row">
+    <!-- Dark table start -->
+    <div class="col-12 mt-5">
+        <div class="card">
+            <div class="card-body">
+                <div class="data-tables datatable-dark">
+                    <table class="text-center patientListDataTable">
+                        <thead class="text-capitalize">
+                            <tr>
+                                <th>Name</th>
+                                <th>Address</th>
+                                <th>PhoneNumber</th>
+                                <th>Gender</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Dark table end -->
+
+    <!-- Edit Modal -->
+    <div class="modal fade" id="patientEditModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">  
+                    <h5 class="modal-title">Edit</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12 col-ml-12">
+                            <!-- Textual inputs start -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <input type="hidden" id="ePatientId" />
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">Name</label>
+                                        <input class="form-control" type="text" id="ePatientName">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">Address</label>
+                                        <input class="form-control" type="text" id="ePatientAddress">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="Gender">Gender</label>
+                                        <select class="form-control valid" data-val="true" data-val-required="The Gender field is required." id="ePatientGender" name="Gender">
+                                            <option value="true">Male</option>
+                                            <option value="false">Female</option>
+                                        </select>
+                                        <span class="text-danger field-validation-valid" data-valmsg-for="Gender" data-valmsg-replace="true"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">Phone Number</label>
+                                        <input class="form-control" type="text" id="ePatientPhoneNumber">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Textual inputs end -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary eEditPatientBtn">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section DataTableScripts{
+
+    <script src="~/Scripts/assets/datatable/js/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/assets/datatable/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/Scripts/assets/datatable/js/dataTables.responsive.min.js"></script>
+    <script src="~/Scripts/assets/datatable/js/responsive.bootstrap.min.js"></script>
+}
+
+
+@section Scripts{
+    <script>
+
+        $(document).ready(function () {
+            $(".titlePage").text("Patient List");
+            var isUserDoctor = $("#isUserDoctor").val();
+            var table = $(".patientListDataTable").DataTable({
+                "responsive": true,
+                "orderMulti": false, // for disable multiple column at once
+                "ajax": {
+                    "url": "/Patients/GetPatientList",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "Name", "name": "Name", "autoWidth": true },
+                    { "data": "Address", "name": "Address", "autoWidth": true },
+                    { "data": "PhoneNumber", "name": "PhoneNumber", "autoWidth": true },
+                    { "data": "Gender", "name": "Gender", "autoWidth": true },
+                    {
+                        "render": function (data, type, full, meta) {
+                            var returnStr = "";
+                            if (isUserDoctor) {
+                                returnStr =
+                                    ' <a href="/Patients/PatientDetails?patientId=' + full.ID + '" >Details</a>'
+                            }
+                            else {
+                                returnStr =
+                                    ' <a href="#" class="btnEditPatient" data-id="' + full.ID + '">Edit</a> | ' +
+                                    ' <a href="/Patients/PatientDetails?patientId=' + full.ID + '" >Details</a>'
+                            }
+                            return returnStr;
+                        }
+                    }
+                ]
+            });
+
+            $(document).on('click', '.btnEditPatient', function (e) {
+                e.preventDefault();
+
+                var patientId = $(this).attr("data-id");
+                $.ajax({
+                    url: "GetPatientDetails",
+                    type: "POST",
+                    dataType: "json",
+                    data: { id: patientId },
+                    success: function (result) {
+                        $("#patientEditModal").find("#ePatientId").val(result.ID);
+                        $("#patientEditModal").find("#ePatientName").val(result.Name);
+                        $("#patientEditModal").find("#ePatientAddress").val(result.Address);
+                        $("#patientEditModal").find("#ePatientGender").val(result.GenderBool.toString());
+                        $("#patientEditModal").find("#ePatientPhoneNumber").val(result.PhoneNumber);
+                        $("#patientEditModal").modal();
+                    }
+                })
+            });
+
+            $(document).on('click', '.eEditPatientBtn', function (e) {
+                var modal = $(this).closest('#patientEditModal');
+                var viewModel = {
+                    ID: modal.find("#ePatientId").val(),
+                    Name: modal.find("#ePatientName").val(),
+                    Address: modal.find("#ePatientAddress").val(),
+                    PhoneNumber: modal.find("#ePatientPhoneNumber").val(),
+                    GenderBool: modal.find("#ePatientGender").val()
+                }
+
+                $.ajax({
+                    url: "EditPatient",
+                    type: "POST",
+                    dataType: "json",
+                    data: { viewModel },
+                    success: function (result) {
+                        if (result.success) {
+                            modal.modal('toggle');
+                            table.ajax.reload();
+                        }
+                        else {
+                            swal("Error", "Invalid data", "error")
+                        }
+                    },
+                    error: function () {
+                        swal("Error", "Request failed", "error")
+                    }
+                })
+            });
+        });
+    </script>
+
+}

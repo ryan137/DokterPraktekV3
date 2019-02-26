@@ -22,14 +22,14 @@ namespace DokterPraktekV3
         }
     
         public int ID { get; set; }
-        public string DoctorID { get; set; }
+        public int DoctorID { get; set; }
         public int PatientID { get; set; }
         public string Sickness { get; set; }
         public string DescriptionInfo { get; set; }
         public System.DateTime CheckUpDate { get; set; }
         public decimal CheckUpPrice { get; set; }
     
-        public virtual AspNetUser AspNetUser { get; set; }
+        public virtual Doctor Doctor { get; set; }
         public virtual Patient Patient { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PatientMedicine> PatientMedicines { get; set; }
