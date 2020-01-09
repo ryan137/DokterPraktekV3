@@ -27,7 +27,7 @@
                 <i class="ti-user"></i>
             </div>
             <div class="form-gp">
-                <input class="form-control" name="DateSchedule" min="@ViewBag.BlockDate" placeholder="Booking Date" onfocus="(this.type='date')" onfocusout="(this.type='')">
+                <input class="form-control" name="DateSchedule" placeholder="Booking Date" onfocus="(this.type='date')" onfocusout="(this.type='')">
                 @Html.ValidationMessageFor(model => model.DateSchedule, "", new { @class = "text-danger" })
             </div>
             <div class="submit-btn-area">

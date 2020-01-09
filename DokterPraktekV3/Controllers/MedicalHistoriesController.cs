@@ -95,7 +95,7 @@ namespace DokterPraktekV3
                     model.ID = item.ID;
                     model.Sickness = item.Sickness;
                     model.DescriptionInfo = item.DescriptionInfo;
-                    model.CheckUpDate = item.CheckUpDate.ToShortDateString();
+                    model.CheckUpDate = item.CheckUpDate.ToString("dd-MM-yyyy");
                     viewModel.Add(model);
                 }
             }

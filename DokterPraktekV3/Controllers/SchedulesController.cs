@@ -48,7 +48,7 @@ namespace DokterPraktekV3.Controllers
                             BookingNumber = sch.BookingNumber,
                             BookingStatus = sch.BookingStatus,
                             PatientName = sch.Patient.Name,
-                            DateSchedule = sch.DateSchedule.ToShortDateString()
+                            DateSchedule = sch.DateSchedule.ToString("dd-MM-yyyy")
                         };
 
                         viewModel.Add(vm);
@@ -67,7 +67,7 @@ namespace DokterPraktekV3.Controllers
                         BookingNumber = sch.BookingNumber,
                         PatientName = sch.Patient.Name,
                         BookingStatus = sch.BookingStatus,
-                        DateSchedule = sch.DateSchedule.ToShortDateString()
+                        DateSchedule = sch.DateSchedule.ToString("dd-MM-yyyy")
                     };
 
                     viewModel.Add(vm);
@@ -137,7 +137,7 @@ namespace DokterPraktekV3.Controllers
                     DoctorName = sch.Doctor.Name,
                     PatientName = sch.Patient.Name,
                     BookingStatus = sch.BookingStatus,
-                    DateSchedule = sch.DateSchedule.ToShortDateString()
+                    DateSchedule = sch.DateSchedule.ToString("dd-MM-yyyy")
                 };
 
                 viewModel.Add(vm);
